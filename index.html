@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bus Ticket Counter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🚌</span>
+      <div>
+        <h1 id="brandName">My Bus Company</h1>
+        <p class="sub">Ticket Counter</p>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-view="newTicket">New Ticket</button>
+      <button class="tab" data-view="history">Ticket History</button>
+      <button class="tab" data-view="settings">Settings</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============ NEW TICKET ============ -->
+    <section id="newTicket" class="view active">
+      <form id="ticketForm" novalidate>
+        <div class="grid">
+          <!-- Passenger -->
+          <fieldset class="card">
+            <legend>Passenger Details</legend>
+            <label>Full name *
+              <input name="name" required placeholder="e.g. Ali Khan">
+            </label>
+            <div class="row">
+              <label>Phone *
+                <input name="phone" type="tel" required placeholder="e.g. 0300 1234567">
+              </label>
+              <label>Email (Gmail)
+                <input name="email" type="email" placeholder="name@gmail.com">
+              </label>
+            </div>
+            <div class="row">
+              <label>ID / CNIC No.
+                <input name="idNumber" placeholder="optional">
+              </label>
+              <label>Gender
+                <select name="gender">
+                  <option value="">—</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Other</option>
+                </select>
+              </label>
+            </div>
+            <div class="row">
+              <label>No. of passengers *
+                <input name="passengers" type="number" min="1" value="1" required>
+              </label>
+              <label>Seat No(s).
+                <input name="seats" placeholder="e.g. 12, 13">
+              </label>
+            </div>
+            <label>Emergency contact
+              <input name="emergency" placeholder="optional name / phone">
+            </label>
+          </fieldset>
+
+          <!-- Journey -->
+          <fieldset class="card">
+            <legend>Journey</legend>
+            <div class="row">
+              <label>From *
+                <input name="from" required list="cityList" placeholder="Departure city">
+              </label>
+              <label>To *
+                <input name="to" required list="cityList" placeholder="Destination city">
+              </label>
+            </div>
+            <div class="row">
+              <label>Departure date *
+                <input name="date" type="date" required>
+              </label>
+              <label>Departure time *
+                <input name="time" type="time" required>
+              </label>
+            </div>
+            <div class="row">
+              <label>Bus No. / Coach
+                <input name="busNo" placeholder="e.g. LES-1234">
+              </label>
+              <label>Bus class
+                <select name="busClass">
+                  <option>Standard</option>
+                  <option>Executive</option>
+                  <option>Business</option>
+                  <option>Sleeper</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="stops-head">
+              <h3>Stops on the way</h3>
+              <button type="button" class="btn small" id="addStop">+ Add stop</button>
+            </div>
+            <p class="hint" id="noStops">No stops added — direct route.</p>
+            <ol id="stops" class="stops"></ol>
+
+            <label class="check">
+              <input type="checkbox" name="roundTrip" id="roundTrip">
+              Round trip (return ticket)
+            </label>
+            <div id="returnBox" class="return-box hidden">
+              <div class="row">
+                <label>Return date *
+                  <input name="returnDate" type="date">
+                </label>
+                <label>Return time *
+                  <input name="returnTime" type="time">
+                </label>
+              </div>
+              <label>Return Bus No.
+                <input name="returnBusNo" placeholder="optional">
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Fare -->
+          <fieldset class="card">
+            <legend>Fare</legend>
+            <div class="row">
+              <label>Fare per seat (<span class="cur"></span>) *
+                <input name="fare" type="number" min="0" step="any" required value="0">
+              </label>
+              <label id="returnFareLabel" class="hidden">Return fare per seat (<span class="cur"></span>)
+                <input name="returnFare" type="number" min="0" step="any" value="0">
+              </label>
+            </div>
+            <div class="row">
+              <label>Extra charges (<span class="cur"></span>)
+                <input name="extra" type="number" min="0" step="any" value="0" placeholder="luggage, etc.">
+              </label>
+              <label>Discount (<span class="cur"></span>)
+                <input name="discount" type="number" min="0" step="any" value="0">
+              </label>
+            </div>
+            <div class="row">
+              <label>Payment method
+                <select name="payment">
+                  <option>Cash</option>
+                  <option>Card</option>
+                  <option>Bank Transfer</option>
+                  <option>Mobile Wallet</option>
+                </select>
+              </label>
+              <label>Counter staff
+                <input name="agent" placeholder="Your name">
+              </label>
+            </div>
+            <label>Notes
+              <textarea name="notes" rows="2" placeholder="Any extra detail to print on ticket"></textarea>
+            </label>
+
+            <div class="total-box">
+              <div><span>Outbound</span><b id="tOut">0</b></div>
+              <div id="tRetRow" class="hidden"><span>Return</span><b id="tRet">0</b></div>
+              <div><span>Extra</span><b id="tExtra">0</b></div>
+              <div><span>Discount</span><b id="tDisc">0</b></div>
+              <div class="grand"><span>TOTAL</span><b id="tTotal">0</b></div>
+            </div>
+          </fieldset>
+        </div>
+
+        <p id="formError" class="error hidden"></p>
+
+        <div class="actions">
+          <button type="reset" class="btn ghost" id="resetBtn">Clear</button>
+          <button type="submit" class="btn primary">Generate Ticket PDF</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ HISTORY ============ -->
+    <section id="history" class="view">
+      <div class="card">
+        <div class="history-head">
+          <h2>Ticket History</h2>
+          <input id="search" placeholder="Search name, phone, ticket no, city…">
+        </div>
+        <p class="hint">Saved on this computer's browser only.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket No.</th><th>Passenger</th><th>Phone</th><th>Route</th>
+                <th>Date</th><th>Type</th><th>Total</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+        <p id="historyEmpty" class="hint">No tickets yet.</p>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section id="settings" class="view">
+      <form id="settingsForm" class="card narrow">
+        <h2>Company Settings</h2>
+        <p class="hint">These details are printed on every ticket.</p>
+        <label>Company name
+          <input name="company" placeholder="My Bus Company">
+        </label>
+        <label>Company phone
+          <input name="companyPhone" placeholder="e.g. 0300 0000000">
+        </label>
+        <label>Address / Terminal
+          <input name="companyAddress" placeholder="e.g. Main Bus Terminal">
+        </label>
+        <div class="row">
+          <label>Currency symbol
+            <input name="currency" placeholder="Rs">
+          </label>
+          <label>Ticket number prefix
+            <input name="prefix" placeholder="TKT">
+          </label>
+        </div>
+        <label>Saved cities (one per line — shown as suggestions)
+          <textarea name="cities" rows="4" placeholder="Lahore&#10;Islamabad&#10;Karachi"></textarea>
+        </label>
+        <label>Terms printed on ticket
+          <textarea name="terms" rows="4"></textarea>
+        </label>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="clearHistory">Delete all history</button>
+          <button type="submit" class="btn primary">Save settings</button>
+        </div>
+        <p id="settingsSaved" class="ok hidden">Saved ✔</p>
+      </form>
+    </section>
+  </main>
+
+  <datalist id="cityList"></datalist>
+
+  <template id="stopTpl">
+    <li class="stop">
+      <input class="stop-name" placeholder="Stop name / city">
+      <input class="stop-time" type="time" title="Arrival time (optional)">
+      <button type="button" class="icon up" title="Move up">↑</button>
+      <button type="button" class="icon down" title="Move down">↓</button>
+      <button type="button" class="icon del" title="Remove">✕</button>
+    </li>
+  </template>
+
+  <script src="lib/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
